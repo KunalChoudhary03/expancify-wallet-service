@@ -1,13 +1,12 @@
 const expenseModel = require("../model/expence.model");
 
 async function addExpense(req, res) {
-
-  const { title, amount, date , paidBy} = req.body;
-
   try {
-    if (!title || !amount || !paidBy) {
+    const { title, amount, date } = req.body;
+
+    if (!title || !amount) {
       return res.status(400).json({
-        message: "Title, amount and paidBy are required"
+        message: "Title and amount are required"
       });
     }
 
@@ -15,7 +14,7 @@ async function addExpense(req, res) {
       title,
       amount,
       date: date || new Date(),
-      paidBy: paidBy
+      paidBy: req.user._id   // 👈 yaha se aayega
     });
 
     res.status(201).json({
@@ -45,7 +44,6 @@ async function getExpenses(req, res) {
     });
   }
 }
-
 
 async function updateExpense(req, res) {
   try {
