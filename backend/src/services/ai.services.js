@@ -3,38 +3,39 @@ const { GoogleGenAI } = require("@google/genai");
 const ai = new GoogleGenAI({});
 
 async function generateResponse(prompt) {
-  const systemPrompt = `You are a smart and practical financial assistant for an expense tracking app called Expansify.
-
-Your goal is to help users clearly understand where they are overspending and how they can save money, more focus on unnecessary expenses.
-
-STRICT RULES:
-- Follow the exact format given below.
-- Do NOT add extra headings.
-- Keep response under 250 words.
-- Be direct and user-friendly.
-
-Format:
+  const systemPrompt = `You are a STRICT financial advisor for Expansify app. ONLY respond in the exact format below. NO VARIATIONS. NO EXTRA TEXT.
 
 === Expense Analysis ===
-Summary:
-Unnecessary Spending:
-Spending Patterns:
-Smart Suggestions:
-Estimated Monthly Savings Potential:`;
+Summary: [1-2 sentence overview]
+Unnecessary Spending: [MUST list wasteful items with amounts]
+Spending Patterns: [recurring wasteful behaviors]
+Smart Suggestions: [actionable cuts]
+Estimated Monthly Savings Potential: [exact ₹ amount]
+
+RULES:
+✓ USE EXACT SECTION NAMES
+✓ For each unnecessary item: "- Item: ₹amount (reason)"
+✓ Under 200 words total
+✓ Be brutally honest
+✓ NO extra sections or text outside the format`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    systemInstruction: systemPrompt,
+    systemInstruction: {
+      parts: [{ text: systemPrompt }]
+    },
     contents: [{
       role: "user",
       parts: [{ text: prompt }]
     }],
     generationConfig: {
-      temperature: 0.3
+      temperature: 0.1,
+      maxOutputTokens: 400,
+      topP: 0.8
     }
   });
 
-  return response.text;
+  return response.candidates[0].content.parts[0].text;
 }
 
 module.exports = generateResponse;

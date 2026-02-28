@@ -8,6 +8,8 @@ import Login from '../pages/Login'
 import Register from '../pages/Register'
 import Dashboard from '../pages/Dashboard'
 import Features from '../pages/Features'
+import UpdateExpense from '../components/UpdateExpense'
+import Contact from '../pages/Contact'
 const AppRoutes = () => {
   return (
     <div>
@@ -19,8 +21,10 @@ const AppRoutes = () => {
              <Route path='/ExpenseCard' element={<ExpenseCard />} />
              <Route path='/dashboard' element={<Dashboard />} />
              <Route path='/login' element={<Login />} />
+             <Route path='/update/:expenseId' element={<UpdateExpense />} />
              <Route path='/features' element={<Features />} />
              <Route path='/register' element={<Register />} />
+             <Route path='/contact' element={<Contact />} />
              <Route path='*' element={<h1>404 Not Found</h1>} />
         </Routes>
     </div>

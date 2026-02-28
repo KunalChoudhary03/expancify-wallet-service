@@ -11,9 +11,13 @@ const Register = () => {
     firstName: "",
     lastName: ""
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const response = await axios.post(
@@ -22,88 +26,159 @@ const Register = () => {
         { withCredentials: true }
       );
 
-      console.log(response.data);
-      alert("Registration Successful");
-      navigate("/");
+      alert("Registration Successful! Please login.");
+      navigate("/login");
     } catch (err) {
-      console.log(err.response?.data || err.message);
-      alert("Registration Failed");
+      const errorMsg = err.response?.data?.message || "Registration failed. Please try again.";
+      setError(errorMsg);
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 relative">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 relative px-4">
       <button
         onClick={() => navigate("/")}
-        className="absolute top-6 left-6 text-gray-600 hover:text-gray-800 transition font-semibold text-lg"
+        className="absolute top-6 left-6 text-gray-400 hover:text-white transition font-semibold text-lg"
       >
         ← Back
       </button>
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Create Account
-        </h2>
+
+      <div className="bg-gray-800 shadow-2xl rounded-2xl p-8 w-full max-w-md border border-gray-700 animate-in fade-in duration-500">
+        {/* Header */}
+        <div className="mb-8 animate-in fade-in slide-in-from-top duration-500 delay-100">
+          <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
+          <p className="text-gray-400">Start managing your expenses today</p>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg text-red-400 text-sm animate-in fade-in shake duration-300">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleRegister} className="space-y-4">
+          {/* Username Field */}
+          <div className="animate-in fade-in slide-in-from-left duration-500 delay-150">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="john_doe"
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 hover:border-gray-500"
+              required
+              disabled={loading}
+            />
+          </div>
 
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+          {/* Full Name Fields */}
+          <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-left duration-500 delay-200">
+            {/* First Name Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                First Name
+              </label>
+              <input
+                type="text"
+                value={fullName.firstName}
+                onChange={(e) =>
+                  setFullName({ ...fullName, firstName: e.target.value })
+                }
+                placeholder="John"
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 hover:border-gray-500"
+                required
+                disabled={loading}
+              />
+            </div>
 
-          <input
-            type="text"
-            placeholder="First Name"
-            value={fullName.firstName}
-            onChange={(e) =>
-              setFullName({ ...fullName, firstName: e.target.value })
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+            {/* Last Name Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Last Name
+              </label>
+              <input
+                type="text"
+                value={fullName.lastName}
+                onChange={(e) =>
+                  setFullName({ ...fullName, lastName: e.target.value })
+                }
+                placeholder="Doe"
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 hover:border-gray-500"
+                required
+                disabled={loading}
+              />
+            </div>
+          </div>
 
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={fullName.lastName}
-            onChange={(e) =>
-              setFullName({ ...fullName, lastName: e.target.value })
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+          {/* Email Field */}
+          <div className="animate-in fade-in slide-in-from-left duration-500 delay-250">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="john@example.com"
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 hover:border-gray-500"
+              required
+              disabled={loading}
+            />
+          </div>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
+          {/* Password Field */}
+          <div className="animate-in fade-in slide-in-from-left duration-500 delay-300">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 hover:border-gray-500"
+              required
+              disabled={loading}
+            />
+            <p className="text-xs text-gray-500 mt-1">At least 8 characters recommended</p>
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-
+          {/* Register Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-6 animate-in fade-in slide-in-from-bottom duration-500 delay-350"
           >
-            Register
+            {loading ? "Creating account..." : "Create Account"}
           </button>
-      <p className="text-center text-gray-600 mt-4">
-        Already have an account? <a href="/login" className="text-blue-600 hover:underline">Login</a>
-      </p>
+
+          {/* Divider */}
+          <div className="relative my-6 animate-in fade-in duration-500 delay-400">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-800 text-gray-400">Already registered?</span>
+            </div>
+          </div>
+
+          {/* Login Link */}
+          <p className="text-center text-gray-400 animate-in fade-in delay-500">
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="text-indigo-400 hover:text-indigo-300 font-semibold transition-all duration-300 hover:underline"
+            >
+              Login here
+            </button>
+          </p>
         </form>
       </div>
     </div>

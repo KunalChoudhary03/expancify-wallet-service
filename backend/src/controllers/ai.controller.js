@@ -14,17 +14,22 @@ async function generateContent(req, res) {
       });
     }
 
-    // Create structured prompt
-    const prompt = `
-    Analyze the following expenses and provide:
-    - Total spending
-    - Spending pattern
-    - Saving suggestions
-    - Any unusual activity
-    
-    Expense Data:
-    ${JSON.stringify(expenses)}
-    `;
+    // Create structured prompt with formatted expenses
+    const expenseList = expenses.map(exp => 
+      `${exp.title}: ₹${exp.amount} on ${new Date(exp.date).toLocaleDateString()}`
+    ).join('\n');
+
+    const prompt = `ANALYZE THESE USER EXPENSES STRICTLY:
+
+${expenseList}
+
+RESPOND WITH EXACT FORMAT:
+=== Expense Analysis ===
+Summary: [brief overview]
+Unnecessary Spending: [list wasteful items only]
+Spending Patterns: [recurring wasteful patterns]
+Smart Suggestions: [actionable cost cuts]
+Estimated Monthly Savings Potential: [exact ₹ amount]`;
 
     // Call AI service
     const response = await generateResponse(prompt);

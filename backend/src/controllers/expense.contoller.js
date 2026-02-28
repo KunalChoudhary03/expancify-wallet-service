@@ -32,7 +32,7 @@ async function addExpense(req, res) {
 
 async function getExpenses(req, res) {
   try {
-    const expenses = await expenseModel.find({ paidBy: req.user._id }).sort({ date: -1 }).limit(7);
+    const expenses = await expenseModel.find({ paidBy: req.user._id }).sort({ date: -1 });
     res.status(200).json({
       message: "Expenses retrieved successfully",
       expenses
@@ -90,7 +90,10 @@ async function updateExpense(req, res) {
 async function deleteExpense(req, res) {
   try {
     const { id } = req.params;
-    const deletedExpense = await expenseModel.findByIdAndDelete(id);
+    const deletedExpense = await expenseModel.findOneAndDelete({
+      _id: id,
+      paidBy: req.user._id
+    });
     if (!deletedExpense) {
       return res.status(404).json({
         message: "Expense not found or you are not authorized to delete it"

@@ -1,91 +1,138 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const demoExpenses = [
-  { id: 1, title: "Naashta", amount: 90, paidBy: "Kunal Choudhary (me)", day: "Today" },
-  { id: 2, title: "Chai", amount: 30, paidBy: "Kunal Choudhary (me)", day: "Today" },
-  { id: 3, title: "Kirana", amount: 80, paidBy: "Siddharth", day: "Yesterday" },
-  { id: 4, title: "Nanaksar", amount: 600, paidBy: "Siddharth", day: "Yesterday" },
-  { id: 5, title: "Csb", amount: 45, paidBy: "Kunal Choudhary (me)", day: "Yesterday" }
-];
-
 const ExpenseList = () => {
+  const [expenses, setExpenses] = useState([]);
   const navigate = useNavigate();
-  const todayExpenses = demoExpenses.filter(e => e.day === "Today");
-  const yesterdayExpenses = demoExpenses.filter(e => e.day === "Yesterday");
 
-  const totalExpenses = demoExpenses.reduce((acc, curr) => acc + curr.amount, 0);
-  const myExpenses = demoExpenses
-    .filter(e => e.paidBy.includes("(me)"))
-    .reduce((acc, curr) => acc + curr.amount, 0);
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await axios.get(
+          "http://localhost:3000/api/expenses/get",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
+        );
+
+        setExpenses(response.data.expenses || response.data);
+      } catch (err) {
+        console.log(err.response?.data || err.message);
+        alert("Failed to fetch expenses.");
+      }
+    };
+
+    fetchExpenses();
+  }, []);
+
+  // 📌 Group expenses by date
+  const groupByDate = (expenses) => {
+    const grouped = {};
+
+    expenses.forEach((expense) => {
+      const dateObj = new Date(expense.date);
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+
+      let label = dateObj.toLocaleDateString();
+
+      if (dateObj.toDateString() === today.toDateString()) {
+        label = "Today";
+      } else if (dateObj.toDateString() === yesterday.toDateString()) {
+        label = "Yesterday";
+      }
+
+      if (!grouped[label]) {
+        grouped[label] = [];
+      }
+
+      grouped[label].push(expense);
+    });
+
+    return grouped;
+  };
+
+  const groupedExpenses = groupByDate(expenses);
+  
+  // Calculate total expense
+  const totalExpense = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 py-6">
+    <div className="min-h-screen bg-gray-950 pt-20 pb-24 px-4">
+      <div className="max-w-3xl mx-auto">
 
-      {/* Top Summary */}
-      <div className="flex justify-between mb-8">
-        <div>
-          <p className="text-gray-400 text-sm">My Expenses</p>
-          <h2 className="text-2xl font-bold">₹{myExpenses.toFixed(2)}</h2>
+        {/* Header with Total */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="animate-in fade-in slide-in-from-left duration-500">
+            <h2 className="text-3xl font-bold text-white">
+              My Expenses
+            </h2>
+          </div>
+
+          {/* Total Expense Card */}
+          <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-in fade-in slide-in-from-right duration-500 group">
+            <p className="text-indigo-200 text-sm font-medium mb-1 group-hover:text-white transition">Total Expenses</p>
+            <h3 className="text-3xl font-bold text-white group-hover:text-indigo-100 transition">₹ {totalExpense.toLocaleString()}</h3>
+            <p className="text-indigo-300 text-xs mt-2">{expenses.length} transactions</p>
+          </div>
         </div>
 
-        <div>
-          <p className="text-gray-400 text-sm">Total Expenses</p>
-          <h2 className="text-2xl font-bold">₹{totalExpenses.toFixed(2)}</h2>
-        </div>
-      </div>
-
-      {/* Today Section */}
-      <h3 className="text-xl font-semibold mb-3">Today</h3>
-
-      <div className="space-y-4">
-        {todayExpenses.map((expense) => (
-          <div
-            key={expense.id}
-            className="bg-zinc-900 rounded-2xl p-4 flex justify-between items-center"
-          >
-            <div>
-              <h4 className="text-lg font-medium">{expense.title}</h4>
-              <p className="text-sm text-gray-400">
-                Paid by {expense.paidBy}
-              </p>
-            </div>
-
-            <h3 className="text-lg font-semibold">
-              ₹{expense.amount.toFixed(2)}
-            </h3>
+        {/* Expense List */}
+        {Object.keys(groupedExpenses).length === 0 ? (
+          <div className="bg-gray-800 p-8 rounded-2xl text-center border border-gray-700 animate-in fade-in duration-500">
+            <p className="text-gray-400 text-lg">
+              No expenses found. Start adding one!
+            </p>
           </div>
-        ))}
-      </div>
+        ) : (
+          Object.entries(groupedExpenses).map(([date, items], index) => (
+            <div key={date} className={`mb-8 animate-in fade-in slide-in-from-bottom duration-500`} style={{animationDelay: `${index * 100}ms`}}>
+              
+              {/* Date Heading */}
+              <h3 className="text-xl text-white font-semibold mb-4 text-gray-300">
+                {date}
+              </h3>
 
-      {/* Yesterday Section */}
-      <h3 className="text-xl font-semibold mt-8 mb-3">Yesterday</h3>
+              <div className="space-y-3">
+                {items.map((expense, itemIndex) => (
+                  <div
+                    key={expense._id}
+                    onClick={() => navigate(`/update/${expense._id}`)}
+                    className="bg-gray-800 p-5 rounded-xl flex justify-between items-center shadow-md hover:shadow-2xl hover:shadow-indigo-500/20 hover:border-indigo-500 hover:scale-105 hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-gray-700 group animate-in fade-in slide-in-from-left duration-500"
+                    style={{animationDelay: `${itemIndex * 50}ms`}}
+                  >
+                    <div className="flex-1">
+                      <h4 className="text-lg font-semibold text-white group-hover:text-indigo-400 transition duration-300">
+                        {expense.title}
+                      </h4>
+                    </div>
 
-      <div className="space-y-4">
-        {yesterdayExpenses.map((expense) => (
-          <div
-            key={expense.id}
-            className="bg-zinc-900 rounded-2xl p-4 flex justify-between items-center"
-          >
-            <div>
-              <h4 className="text-lg font-medium">{expense.title}</h4>
-              <p className="text-sm text-gray-400">
-                Paid by {expense.paidBy}
-              </p>
+                    <span className="text-xl font-bold text-green-400 group-hover:text-green-300 group-hover:scale-110 transition-all duration-300">
+                      ₹ {expense.amount}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-
-            <h3 className="text-lg font-semibold">
-              ₹{expense.amount.toFixed(2)}
-            </h3>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
-      {/* Floating Button */}
-      <button onClick={() => navigate("/AddExpense")} className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-3xl shadow-lg">
-        +
+      {/* Floating Add Button - Smaller */}
+      <button
+        onClick={() => navigate("/AddExpense")}
+        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-indigo-600 text-white px-5 py-2 rounded-full shadow-lg hover:bg-indigo-500 hover:shadow-indigo-500/50 hover:scale-110 active:scale-95 transition-all duration-300 font-semibold text-sm z-50 flex items-center gap-1.5 animate-in fade-in slide-in-from-bottom duration-500"
+      >
+        <span className="text-lg">+</span>
+        Add
       </button>
-
     </div>
   );
 };
