@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
+  const [selectedExpense, setSelectedExpense] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,7 +25,6 @@ const ExpenseList = () => {
         setExpenses(response.data.expenses || response.data);
       } catch (err) {
         console.log(err.response?.data || err.message);
-        alert("Failed to fetch expenses.");
       }
     };
 
@@ -63,6 +63,20 @@ const ExpenseList = () => {
   
   // Calculate total expense
   const totalExpense = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
+
+  const handleCardClick = (expense) => {
+    setSelectedExpense(expense);
+  };
+
+  const handleUpdate = () => {
+    navigate(`/update/${selectedExpense._id}`);
+    setSelectedExpense(null);
+  };
+
+  const handleDelete = () => {
+    navigate(`/delete/${selectedExpense._id}`);
+    setSelectedExpense(null);
+  };
 
   return (
     <div className="min-h-screen bg-gray-950 pt-20 pb-24 px-4">
@@ -104,7 +118,7 @@ const ExpenseList = () => {
                 {items.map((expense, itemIndex) => (
                   <div
                     key={expense._id}
-                    onClick={() => navigate(`/update/${expense._id}`)}
+                    onClick={() => handleCardClick(expense)}
                     className="bg-gray-800 p-5 rounded-xl flex justify-between items-center shadow-md hover:shadow-2xl hover:shadow-indigo-500/20 hover:border-indigo-500 hover:scale-105 hover:-translate-y-1 transition-all duration-300 cursor-pointer border border-gray-700 group animate-in fade-in slide-in-from-left duration-500"
                     style={{animationDelay: `${itemIndex * 50}ms`}}
                   >
@@ -124,6 +138,43 @@ const ExpenseList = () => {
           ))
         )}
       </div>
+
+      {/* Modal for Update/Delete Options */}
+      {selectedExpense && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-gray-800 rounded-2xl p-6 shadow-2xl border border-gray-700 max-w-sm w-full mx-4 animate-in zoom-in duration-200">
+            <h3 className="text-lg font-bold text-white mb-4 text-center">
+              {selectedExpense.title}
+            </h3>
+            
+            <div className="bg-gray-700 p-4 rounded-lg mb-6 text-center border border-gray-600">
+              <p className="text-gray-400 text-sm">Amount</p>
+              <p className="text-green-400 text-2xl font-bold">₹ {selectedExpense.amount}</p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={handleUpdate}
+                className="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-500 transition duration-200"
+              >
+                Edit Expense
+              </button>
+              <button
+                onClick={handleDelete}
+                className="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-500 transition duration-200"
+              >
+                Delete Expense
+              </button>
+              <button
+                onClick={() => setSelectedExpense(null)}
+                className="w-full bg-gray-700 text-white py-2 rounded-lg font-semibold hover:bg-gray-600 transition duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Add Button - Smaller */}
       <button

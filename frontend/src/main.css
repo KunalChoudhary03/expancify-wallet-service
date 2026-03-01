@@ -1,1 +1,12 @@
-@import "tailwindcss"
+@import "tailwindcss";
+
+/* Prevent navbar shift due to scrollbar */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+/* Ensure consistent layout */
+body {
+  overflow-x: hidden;
+}

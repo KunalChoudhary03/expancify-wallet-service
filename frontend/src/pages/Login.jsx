@@ -21,8 +21,7 @@ const Login = () => {
         { withCredentials: true }
       );  
       localStorage.setItem("token", response.data.token);
-      alert("Login Successful");
-      navigate('/');
+      setTimeout(() => navigate('/'), 500);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Login failed. Please try again.";
       setError(errorMsg);
@@ -36,9 +35,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-950 relative px-4">
       <button
         onClick={() => navigate("/")}
-        className="absolute top-6 left-6 text-gray-400 hover:text-white transition font-semibold text-lg"
+        className="absolute top-6 left-6 text-gray-400 hover:text-white transition text-2xl"
       >
-        ← Back
+        ←
       </button>
       
       <div className="bg-gray-800 shadow-2xl rounded-2xl p-8 w-full max-w-md border border-gray-700 animate-in fade-in duration-500">

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
 const Dashboard = () => {
   const [aiResponse, setAiResponse] = useState("");
   const [loading, setLoading] = useState(false);
@@ -137,14 +136,13 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-950 pt-20 pb-16 px-4">
       <div className="max-w-4xl mx-auto">
-
         {/* Header */}
         <div className="mb-8 animate-in fade-in slide-in-from-top duration-500">
           <button
             onClick={() => navigate("/")}
-            className="text-gray-400 hover:text-indigo-400 mb-4 flex items-center gap-2 transition"
+            className="text-gray-400 hover:text-indigo-400 mb-4 transition text-2xl"
           >
-            ← Back
+            ←
           </button>
 
           <h1 className="text-4xl font-bold text-white mb-2">

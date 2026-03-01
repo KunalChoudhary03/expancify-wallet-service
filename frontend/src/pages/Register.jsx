@@ -13,6 +13,7 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -26,8 +27,8 @@ const Register = () => {
         { withCredentials: true }
       );
 
-      alert("Registration Successful! Please login.");
-      navigate("/login");
+      setSuccess("Registration Successful! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Registration failed. Please try again.";
       setError(errorMsg);
@@ -41,9 +42,9 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-950 relative px-4">
       <button
         onClick={() => navigate("/")}
-        className="absolute top-6 left-6 text-gray-400 hover:text-white transition font-semibold text-lg"
+        className="absolute top-6 left-6 text-gray-400 hover:text-white transition text-2xl"
       >
-        ← Back
+        ←
       </button>
 
       <div className="bg-gray-800 shadow-2xl rounded-2xl p-8 w-full max-w-md border border-gray-700 animate-in fade-in duration-500">
@@ -52,6 +53,13 @@ const Register = () => {
           <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
           <p className="text-gray-400">Start managing your expenses today</p>
         </div>
+
+        {/* Success Message */}
+        {success && (
+          <div className="mb-6 p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded-lg text-green-400 text-sm animate-in fade-in duration-300">
+            ✓ {success} Let's get you logged in!
+          </div>
+        )}
 
         {/* Error Message */}
         {error && (

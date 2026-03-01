@@ -8,9 +8,15 @@ const ExpenseForm = () => {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleExpense = async (e) => {
   e.preventDefault();
+  setError("");
+  setSuccess("");
+  setLoading(true);
 
   try {
     const token = localStorage.getItem("token");
@@ -26,12 +32,14 @@ const ExpenseForm = () => {
     );
 
     console.log(response.data);
-    alert("Expense added successfully");
-    navigate("/");
+    setSuccess("Expense added successfully!");
+    setTimeout(() => navigate("/"), 1500);
 
   } catch (err) {
     console.log(err.response?.data || err.message);
-    alert("Failed to add expense. Please try again.");
+    setError(err.response?.data?.message || "Failed to add expense. Please try again.");
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -40,14 +48,26 @@ const ExpenseForm = () => {
       <div className="max-w-md w-full p-6 bg-gray-800 shadow-lg rounded-2xl border border-gray-700">
         <button
           onClick={() => navigate("/")}
-          className="mb-4 flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition"
+          className="mb-4 text-gray-400 hover:text-indigo-400 transition text-2xl"
         >
-          ← Back to Home
+          ←
         </button>
 
         <h2 className="text-2xl font-bold text-indigo-400 mb-6 text-center">
           Add Expense
         </h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg text-red-400 text-sm animate-in fade-in duration-300">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded-lg text-green-400 text-sm animate-in fade-in duration-300">
+            ✓ {success}
+          </div>
+        )}
 
         <form onSubmit={handleExpense} className="space-y-4">
           
@@ -97,9 +117,10 @@ const ExpenseForm = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500 transition font-semibold"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Expense
+            {loading ? "Adding..." : "Add Expense"}
           </button>
         </form>
       </div>

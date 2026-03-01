@@ -11,6 +11,8 @@ const UpdateExpense = () => {
     date: ""
   })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
 
   useEffect(() => {
     if (expenseId) {
@@ -41,7 +43,7 @@ const UpdateExpense = () => {
       })
     } catch (err) {
       console.log(err);
-      alert("Error loading expense");
+      setError("Error loading expense. Please try again.");
     }
   }
 
@@ -54,6 +56,8 @@ const UpdateExpense = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError("")
+    setSuccess("")
     setLoading(true)
     try {
       const token = localStorage.getItem("token");
@@ -67,11 +71,11 @@ const UpdateExpense = () => {
         }
       );
       console.log(response.data);
-      alert("Expense updated successfully");
-      navigate("/");
+      setSuccess("Expense updated successfully!");
+      setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       console.log(err);
-      alert("Error updating expense");
+      setError(err.response?.data?.message || "Error updating expense");
     } finally {
       setLoading(false)
     }
@@ -82,13 +86,25 @@ const UpdateExpense = () => {
       <div className="max-w-md w-full p-6 bg-gray-800 shadow-lg rounded-2xl border border-gray-700">
         <button
           onClick={() => navigate("/")}
-          className="mb-4 flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition"
+          className="mb-4 text-gray-400 hover:text-indigo-400 transition text-2xl"
         >
-          ← Back to Home
+          ←
         </button>
         <h2 className="text-2xl font-bold text-indigo-400 mb-6 text-center">
           Update Expense
         </h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg text-red-400 text-sm animate-in fade-in duration-300">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 p-3 bg-green-500 bg-opacity-20 border border-green-500 rounded-lg text-green-400 text-sm animate-in fade-in duration-300">
+            ✓ {success}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -135,6 +151,14 @@ const UpdateExpense = () => {
             className="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-500 transition disabled:opacity-50"
           >
             {loading ? "Updating..." : "Update Expense"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate(`/delete/${expenseId}`)}
+            className="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-500 transition mt-3"
+          >
+            Delete Expense
           </button>
         </form>
       </div>

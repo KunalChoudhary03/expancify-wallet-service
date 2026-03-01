@@ -1,4 +1,4 @@
-import { Routes , Route } from 'react-router-dom'
+import { Routes , Route, useLocation } from 'react-router-dom'
 import ExpenseList from '../components/ExpenseList'
 import ExpenseCard from '../components/ExpenseCard'
 import ExpenseForm from '../components/ExpenseForm'
@@ -9,10 +9,16 @@ import Register from '../pages/Register'
 import Dashboard from '../pages/Dashboard'
 import Features from '../pages/Features'
 import UpdateExpense from '../components/UpdateExpense'
+import DeleteExpense from '../components/DeleteExpense'
 import Contact from '../pages/Contact'
 const AppRoutes = () => {
+  const location = useLocation();
+  const hideNavbarRoutes = ['/login', '/register'];
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+
   return (
     <div>
+        {shouldShowNavbar && <Navbar />}
         <Routes>
            <Route path='/' element={<Home />} />
              <Route path='/ExpenseList' element={<ExpenseList />} />
@@ -22,6 +28,7 @@ const AppRoutes = () => {
              <Route path='/dashboard' element={<Dashboard />} />
              <Route path='/login' element={<Login />} />
              <Route path='/update/:expenseId' element={<UpdateExpense />} />
+             <Route path='/delete/:expenseId' element={<DeleteExpense />} />
              <Route path='/features' element={<Features />} />
              <Route path='/register' element={<Register />} />
              <Route path='/contact' element={<Contact />} />
