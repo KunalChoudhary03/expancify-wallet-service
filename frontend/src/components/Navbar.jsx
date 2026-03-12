@@ -64,9 +64,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full fixed top-0 left-0 right-0 z-50 shadow-md 
+    <nav className="w-full fixed top-0 left-0 z-50 shadow-md 
                     bg-white text-black 
-                    dark:bg-black dark:text-white">
+                    dark:bg-black dark:text-white transition">
       
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         

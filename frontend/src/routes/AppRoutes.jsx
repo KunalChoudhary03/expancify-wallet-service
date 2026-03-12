@@ -1,4 +1,4 @@
-import { Routes , Route, useLocation } from 'react-router-dom'
+import { Routes , Route } from 'react-router-dom'
 import ExpenseList from '../components/ExpenseList'
 import ExpenseCard from '../components/ExpenseCard'
 import ExpenseForm from '../components/ExpenseForm'
@@ -12,13 +12,9 @@ import UpdateExpense from '../components/UpdateExpense'
 import DeleteExpense from '../components/DeleteExpense'
 import Contact from '../pages/Contact'
 const AppRoutes = () => {
-  const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/register'];
-  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
-
   return (
     <div>
-        {shouldShowNavbar && <Navbar />}
+        <Navbar />
         <Routes>
            <Route path='/' element={<Home />} />
              <Route path='/ExpenseList' element={<ExpenseList />} />
